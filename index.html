@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="./index.css" />
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 30px;
+        }
+
+        #result {
+            margin-top: 1em;
+        }
+
+        #output-params, #output-result {
+            white-space: pre;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        #submit {
+            margin: 1em 0;
+            font-size: 1.3em;
+        }
+
+        .form__item {
+            margin: .5em 0;
+        }
+
+        h1 {
+            margin: 0 0 .5em 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Video Codec Supported Resolutions</h1>
+    <div class="form">
+        <fieldset>
+            <legend>Parameters</legend>
+
+            <div class="form__item">Type: <select id="select-type">
+                    <option value="file">file</option>
+                    <option value="media-source">media-source</option>
+                    <option value="webrtc">webrtc</option>
+                </select>
+            </div>
+
+            <fieldset>
+                <legend>Video</legend>
+                <div class="form__item">Content type: <input id="input-video-content-type" type="text" list="codecs" style="width: 20em" value="" />
+                <datalist id="codecs">
+                    <option value='video/mp4; codecs="avc1.42E01E"'></option>
+                    <option value='video/mp4; codecs="avc1.64001E"'></option>
+                    <option value='video/mp4; codecs="avc1.4D401E"'></option>
+                    <option value='video/mp4; codecs="hvc1.1.6.L123.B0"'></option>
+                    <option value='video/mp4; codecs="av01.0.01M.08"'></option>
+                    <option value='video/mp4; codecs="av01.0.15M.10"'></option>
+                    <option value='video/mp4; codecs="dvhe.08.09"'></option>
+                    <option value='video/webm; codecs="vp8"'></option>
+                </datalist>
+                </div>
+
+                <div class="form__item">Framerate:
+                    <input type="text" id="input-video-framerate" value="25" />
+                </div>
+
+                <div class="form__item">Bitrate:
+                    <input type="text" id="input-video-bitrate" value="200000" />
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Key system configuration</legend>
+                <div class="form__item">Key system:
+                    <select id="select-keysystem">
+                        <option value="">none</option>
+                        <option value="com.microsoft.playready.recommendation">com.microsoft.playready</option>
+                        <option value="com.widevine.alpha">com.widevine.alpha</option>
+                    </select>
+                </div>
+
+                <div class="form__item">
+                    Robustness:
+                    <input id="input-robustness" type="text" value="" />
+                </div class="form__item">
+            </fieldset>
+        </fieldset>
+
+        <div class="form__item">
+            <input type="button" id="submit" value="Find" />
+        </div>
+
+        <div id="params">
+            Params:
+            <div id="output-params" style="display: none"></div>
+        </div>
+
+        <div id="result">
+            Result:
+            <div id="output-result" style="display: none"></div>
+        </div>
+    </div>
+
+<script type="module">
+    import { getVideoCodecSupportedResolution } from './dist/index.esm.js';
+
+    const selectType = document.querySelector('#select-type');
+    const inputVideoContentType = document.querySelector('#input-video-content-type');
+    const inputVideoFramerate = document.querySelector('#input-video-framerate');
+    const inputVideoBitrate = document.querySelector('#input-video-bitrate');
+    const selectKeySystem = document.querySelector('#select-keysystem');
+    const inputRobustness = document.querySelector('#input-robustness');
+
+    const submit = document.querySelector('#submit');
+    const outputParams = document.querySelector('#output-params');
+    const outputResult = document.querySelector('#output-result');
+
+    submit.onclick = async () => {
+        outputParams.style.display = 'none';
+        outputResult.style.display = 'none';
+        const params = {
+            type: selectType.value,
+            video: {
+                contentType: inputVideoContentType.value,
+                framerate: parseInt(inputVideoFramerate.value, 10),
+                bitrate: parseInt(inputVideoBitrate.value, 10),
+            },
+            keySystemConfiguration: selectKeySystem.value ? {
+                keySystem: selectKeySystem.value,
+                robustness: inputRobustness.value,
+            } : undefined,
+        };
+
+        const data = await getVideoCodecSupportedResolution(params);
+
+        console.log('params', params);
+        outputParams.style.display = 'block';
+        outputParams.innerText = JSON.stringify(params, null, 4);
+
+        console.log('result', data);
+        outputResult.style.display = 'block';
+        outputResult.innerText = JSON.stringify(data, null, 4);
+    }
+</script>
+
+</body>
+</html>

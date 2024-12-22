@@ -1,0 +1,70 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: white;
+    color: black;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+}
+
+fieldset {
+    margin-top: .5em;
+}
+
+.menu {
+    margin: 0 0 20px 20px;
+    padding: 0;
+    list-style-type: disc;
+}
+
+.menu li {
+    margin: 0;
+    padding: 0 .4em;
+}
+
+#result, #query {
+    margin-top: 1em;
+}
+
+#error {
+    margin-top: 1em;
+    color: red;
+    font-weight: bold;
+}
+
+#input, #output {
+    margin-top: .5em;
+    padding: 5px;
+    white-space: pre;
+    border-radius: 10px;
+    border: 1px dashed gray;  
+    background: #f5f5f5;
+}
+
+.form {
+    padding: 20px 30px;
+}
+
+fieldset.disabled {
+    color: gray;
+    overflow: hidden;
+    height: 2em;
+}
+
+.form__item {
+    padding-top: .5em;
+}
+
+.form__item_required {
+    font-weight: bold;
+}
+
+#submit {
+    font-size: 18px;
+}
