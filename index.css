@@ -1,0 +1,14 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#result {
+    margin-top: 2em;
+    white-space: pre;    
+}
+
+.form {
+    padding: 50px;
+}
