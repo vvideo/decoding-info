@@ -4,11 +4,31 @@ html, body {
     border: 0;
 }
 
+fieldset {
+    margin-top: .5em;
+}
+
 #result {
-    margin-top: 2em;
-    white-space: pre;    
+    margin-top: 1em;
+}
+
+#output {
+    margin-top: .5em;
+    padding: 5px;
+    white-space: pre;
+    border-radius: 10px;
+    border: 1px dashed gray;  
+    background: #f5f5f5;
 }
 
 .form {
     padding: 50px;
+}
+
+.form__item {
+    padding-top: .5em;
+}
+
+#submit {
+    font-size: 18px;
 }
