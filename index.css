@@ -4,6 +4,8 @@ html, body {
     border: 0;
     background-color: white;
     color: black;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 h1 {
