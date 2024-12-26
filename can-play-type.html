@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./index.css" />
+    <title>Test .canPlayType</title>
+</head>
+<body autocomplete="off">
+    <div class="form">
+        <ul class="menu">
+            <li><a href="./decoding-info.html">Test navigator.mediaCapabilities.decodingInfo</a></li>
+            <li><a href="./is-type-supported.html">Test MediaSource.isTypeSupported</a></li>
+            <li><a href="./can-play-type.html">Test canPlayType</a></li>
+        </ul>
+        
+        <h1>Test <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/canPlayType">.canPlayType(type)</a></h1>
+        <fieldset>
+            <datalist id="video-codecs">
+                <option default value='video/mp4; codecs="avc1.42E01E"'>video/mp4; codecs="avc1.42E01E"</option>
+                <option value='video/mp4; codecs="avc1.64001E"'>video/mp4; codecs="avc1.64001E"</option>
+                <option value='video/mp4; codecs="avc1.4D401E"'>video/mp4; codecs="avc1.4D401E"</option>
+                <option value='video/mp4; codecs="hvc1.1.6.L123.B0"'>video/mp4; codecs="hvc1.1.6.L123.B0"</option>
+                <option value='video/mp4; codecs="av01.0.01M.08"'>video/mp4; codecs="av01.0.01M.08"</option>
+                <option value='video/mp4; codecs="av01.0.15M.10"'>video/mp4; codecs="av01.0.15M.10"</option>
+                <option value='video/mp4; codecs="dvhe.08.09"'>video/mp4; codecs="dvhe.08.09"</option>
+                <option value='video/webm; codecs="vp8"'>video/webm; codecs="vp8"</option>
+            </datalist>  
+
+            <div class="form__item">type:
+                <input required id="input-mime-type" type="text" list="video-codecs" size="30" value='video/mp4; codecs="avc1.64001E"' />  <input type="button" id="input-mime-type-reset" value="Reset" /> <br/>
+                <div style="margin-top: .5em">A string specifying the MIME type of the media and (optionally) a codecs parameter containing a comma-separated list of the supported codecs.</div>
+            </div>
+        </fieldset>
+
+        <div class="form__item">
+            <input type="button" id="submit" value="Run" />
+        </div>
+
+        <div id="error"></div>
+
+        <div id="result">
+            Result: <div id="output" style="display: none"></div>
+        </div>
+    </div>
+
+    <script src="./can-play-type.js"></script>
+</body>
+</html>

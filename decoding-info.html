@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./index.css" />
+    <title>Test navigator.mediaCapabilities.decodingInfo</title>
+</head>
+<body autocomplete="off">    
+    <div class="form">
+        <ul class="menu">
+            <li><a href="./decoding-info.html">Test navigator.mediaCapabilities.decodingInfo</a></li>
+            <li><a href="./is-type-supported.html">Test MediaSource.isTypeSupported</a></li>
+            <li><a href="./can-play-type.html">Test canPlayType</a></li>
+        </ul>
+
+        <h1>Test <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities/decodingInfo">navigator.mediaCapabilities.decodingInfo</a></h1>
+        <fieldset>
+            <legend>Parameters for navigator.mediaCapabilities.decodingInfo</legend>
+
+            <div class="form__item">type:
+                <select id="select-type">
+                    <option value="file">file</option>
+                    <option value="media-source">media-source</option>
+                    <option value="webrtc">webrtc</option>
+                </select>
+            </div>
+
+            <fieldset id="fieldset-video">
+                <legend><label><input type="checkbox" id="input-video" checked /> video:</label></legend>
+                <div class="form__item">contentType:
+                    <input required id="input-video-content-type" type="text" list="video-codecs" size="30" value='video/mp4; codecs="avc1.64001E"' />  <input type="button" id="input-video-content-type-reset" value="Reset" /> 
+                    <datalist id="video-codecs">
+                        <option default value='video/mp4; codecs="avc1.42E01E"'>video/mp4; codecs="avc1.42E01E"</option>
+                        <option value='video/mp4; codecs="avc1.64001E"'>video/mp4; codecs="avc1.64001E"</option>
+                        <option value='video/mp4; codecs="avc1.4D401E"'>video/mp4; codecs="avc1.4D401E"</option>
+                        <option value='video/mp4; codecs="hvc1.1.6.L123.B0"'>video/mp4; codecs="hvc1.1.6.L123.B0"</option>
+                        <option value='video/mp4; codecs="av01.0.01M.08"'>video/mp4; codecs="av01.0.01M.08"</option>
+                        <option value='video/mp4; codecs="av01.0.15M.10"'>video/mp4; codecs="av01.0.15M.10"</option>
+                        <option value='video/mp4; codecs="dvhe.08.09"'>video/mp4; codecs="dvhe.08.09"</option>
+                        <option value='video/webm; codecs="vp8"'>video/webm; codecs="vp8"</option>
+                    </datalist>  
+                </div>
+
+                <div class="form__item">framerate:
+                    <input required type="number" id="input-video-framerate" value="25" size="4" />
+                </div>
+
+                <div class="form__item">bitrate:
+                    <input required type="number" id="input-video-bitrate" value="2000000" size="10" />
+                </div>
+
+                <div class="form__item">width:
+                    <input required type="number" id="input-video-width" value="1920" size="5" />
+                </div>
+
+                <div class="form__item">height:
+                    <input required type="number" id="input-video-height" value="1080" size="5" />
+                </div>
+            </fieldset>
+
+            <fieldset id="fieldset-audio" class="disabled">
+                <legend><label><input type="checkbox" id="input-audio" /> audio:</label></legend>
+                <div class="form__item">contentType:
+                    <input required id="input-audio-content-type" type="text" list="audio-codecs" size="30" value='audio/ogg; codecs="vorbis"' /> <input type="button" id="input-audio-content-type-reset" value="Reset" /> 
+                    <datalist id="audio-codecs">
+                        <option value='audio/ogg; codecs="vorbis"'>audio/ogg; codecs="vorbis"</option>
+                        <option value='audio/mp4; codecs="mp4a.40.2"'>audio/mp4; codecs="mp4a.40.2"</option>
+                        <option value='audio/mp4; codecs="ac-3"'>audio/mp4; codecs="ac-3"</option>
+                        <option value='audio/mp4; codecs="ec-3"'>audio/mp4; codecs="ec-3"</option>                   
+                    </datalist>  
+                </div>
+
+                <div class="form__item">channels:
+                    <input required type="number" id="input-audio-channels" value="2" size="2" />
+                </div>
+
+                <div class="form__item">samplerate:
+                    <input required type="number" id="input-audio-samplerate" value="5300" size="8" />
+                </div>
+
+                <div class="form__item">bitrate:
+                    <input required type="number" id="input-audio-bitrate" value="200000" size="10" />
+                </div>
+            </fieldset>            
+            
+            <fieldset id="fieldset-key-system-configuration" class="disabled">
+                <legend><label><input type="checkbox" id="input-key-system-configuration" /> keySystemConfiguration:</label></legend>
+                ⚠️ keySystemConfiguration is not supported in Safari.
+
+                <div class="form__item">keySystem: 
+                    <select id="select-keysystem">
+                        <option value="com.widevine.alpha">com.widevine.alpha</option>
+                        <option value="com.microsoft.playready.recommendation">com.microsoft.playready.recommendation</option>
+                    </select>  
+                </div>
+
+                <div class="form__item">
+                    initDataType: 
+                    <input id="input-init-data-type" list="init-data-types" type="text" value="" />
+                    <datalist id="init-data-types">
+                        <option value="cenc">cenc</option>
+                        <option value="keyids">keyids</option>
+                        <option value="webm">webm</option>
+                    </datalist>
+                </div>
+                
+                <div class="form__item">
+                    distinctiveIdentifier: 
+                    <select id="select-distinctive-indentifier">
+                        <option value="optional">optional</option>
+                        <option value="required">required</option>
+                        <option value="not-allowed">not-allowed</option>
+                    </select>
+                </div>
+
+                <div class="form__item">
+                    persistentState: 
+                    <select id="select-persistent-state">
+                        <option value="optional">optional</option>
+                        <option value="required">required</option>
+                        <option value="not-allowed">not-allowed</option>
+                    </select>
+                </div>
+
+                <div class="form__item">
+                    sessionTypes: 
+                    <select id="select-session-types">
+                        <option value="temporary">temporary</option>
+                        <option value="persistent-license">persistent-license</option>
+                    </select>
+                </div>   
+                
+                <datalist id="robustness-list">
+                    <option value="HW_SECURE_DECODE">HW_SECURE_DECODE (L1 Widevine)</option>
+                    <option value="SW_SECURE_DECODE">SW_SECURE_DECODE (L3 Widevine)</option>
+                    <option value="SL150">SL150 (PlayReady)</option>
+                    <option value="SL2000">SL2000 (PlayReady)</option>
+                    <option value="SL3000">SL3000 (PlayReady)</option>
+                </datalist>
+                
+                <datalist id="encryption-schemes">
+                    <option value="cenc">cenc</option>
+                    <option value="cbcs">cbcs</option>
+                    <option value="cbcs-1-9">cbcs-1-9</option>
+                </datalist>                
+                
+                <fieldset id="fieldset-key-system-configuration-video">
+                    <legend>video:</legend>
+                    <div class="form__item">
+                        robustness: 
+                        <input id="input-video-robustness" list="robustness-list" type="text" value="" />
+                    </div>
+                    <div class="form__item">
+                        encryptionScheme: 
+                        <input id="input-video-encryption-scheme" list="encryption-schemes" type="text" value="" />
+                    </div>
+                </fieldset>
+           
+                <fieldset id="fieldset-key-system-configuration-audio" class="disabled">
+                    <legend>audio:</legend>
+                    <div class="form__item">
+                        robustness: 
+                        <input id="input-audio-robustness" list="robustness-list" type="text" value="" />
+                    </div>
+                    <div class="form__item">
+                        encryptionScheme: 
+                        <input id="input-audio-encryption-scheme" list="encryption-schemes" type="text" value="" />
+                    </div>
+                </fieldset>
+
+            </fieldset>
+        </fieldset>
+
+        <div class="form__item">
+            <input type="button" id="submit" value="Run" />
+        </div>
+
+        <div id="error"></div>
+
+        <div id="result">
+            Result: <div id="output" style="display: none"></div>
+        </div>
+    </div>
+
+    <script src="./decoding-info.js"></script>
+</body>
+</html>

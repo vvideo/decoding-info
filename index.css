@@ -4,12 +4,34 @@ html, body {
     border: 0;
 }
 
+h1 {
+    margin: 0;
+    padding: 0;
+}
+
 fieldset {
     margin-top: .5em;
 }
 
+.menu {
+    margin: 0 0 20px 20px;
+    padding: 0;
+    list-style-type: disc;
+}
+
+.menu li {
+    margin: 0;
+    padding: 0 .4em;
+}
+
 #result {
     margin-top: 1em;
+}
+
+#error {
+    margin-top: 1em;
+    color: red;
+    font-weight: bold;
 }
 
 #output {
@@ -22,7 +44,13 @@ fieldset {
 }
 
 .form {
-    padding: 50px;
+    padding: 20px 30px;
+}
+
+fieldset.disabled {
+    opacity: .5;
+    overflow: hidden;
+    height: 2em;
 }
 
 .form__item {
