@@ -12,6 +12,7 @@
             <li><a href="./is-type-supported.html">Test MediaSource.isTypeSupported</a></li>
             <li><a href="./can-play-type.html">Test canPlayType</a></li>
             <li><a href="https://github.com/vvideo/decoding-info">Github repo</a></li>
+            <li><a target="_blank" href="https://www.w3.org/TR/media-capabilities/">Media Capabilites</a></li>
         </ul>
 
         <h1>Test <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities/decodingInfo">navigator.mediaCapabilities.decodingInfo</a></h1>
@@ -28,8 +29,8 @@
 
             <fieldset id="fieldset-video">
                 <legend><label><input type="checkbox" id="input-video" checked /> video:</label></legend>
-                <div class="form__item">contentType:
-                    <input required id="input-video-content-type" type="text" list="video-codecs" size="30" value='video/mp4; codecs="avc1.64001E"' />  <input type="button" id="input-video-content-type-reset" value="Reset" /> 
+                <div class="form__item form__item_required">contentType:
+                    <input required id="input-video-content-type" type="text" list="video-codecs" size="30" value='video/mp4; codecs="avc1.64001E"' />  <input type="button" id="input-video-content-type-reset" value="×" /> 
                     <datalist id="video-codecs">
                         <option default value='video/mp4; codecs="avc1.42E01E"'>video/mp4; codecs="avc1.42E01E"</option>
                         <option value='video/mp4; codecs="avc1.64001E"'>video/mp4; codecs="avc1.64001E"</option>
@@ -42,27 +43,70 @@
                     </datalist>  
                 </div>
 
-                <div class="form__item">framerate:
+                <div class="form__item form__item_required">framerate:
                     <input required type="number" id="input-video-framerate" value="25" size="4" />
                 </div>
 
-                <div class="form__item">bitrate:
+                <div class="form__item form__item_required">bitrate:
                     <input required type="number" id="input-video-bitrate" value="2000000" size="10" />
                 </div>
 
-                <div class="form__item">width:
+                <div class="form__item form__item_required">width:
                     <input required type="number" id="input-video-width" value="1920" size="5" />
                 </div>
 
-                <div class="form__item">height:
+                <div class="form__item form__item_required">width:
                     <input required type="number" id="input-video-height" value="1080" size="5" />
                 </div>
+
+                <div class="form__item">
+                    <label>
+                        <input type="checkbox" id="checkbox-video-has-alpha-channel" />  hasAlphaChannel
+                    </label>
+                </div>
+
+                <div class="form__item">hdrMetadataType:
+                    <select id="select-video-hdr-metadata-type">
+                        <option value=""></option>
+                        <option value="smpteSt2086">smpteSt2086</option>
+                        <option value="smpteSt2094-10">smpteSt2094-10</option>
+                        <option value="smpteSt2094-40">smpteSt2094-40</option>
+                    </select>
+                </div>                
+
+                <div class="form__item">colorGamut:
+                    <select id="select-video-color-gamut">
+                        <option value=""></option>
+                        <option value="srgb">srgb</option>
+                        <option value="p3">p3</option>
+                        <option value="rec2020">rec2020</option>
+                    </select>
+                </div>
+
+                <div class="form__item">transferFunction:
+                    <select id="select-video-transfer-function">
+                        <option value=""></option> 
+                        <option value="srgb">srgb</option>
+                        <option value="pq">pq</option>
+                        <option value="hlg">hlg</option>
+                    </select>
+                </div>
+
+                <div class="form__item">scalabilityMode:
+                    <input type="text" id="input-video-scalability-mode" value="" size="10" />
+                </div>
+
+                <div class="form__item">
+                    <label>
+                        <input type="checkbox" id="checkbox-spatial-scalability" />  spatialScalability
+                    </label>
+                </div> 
             </fieldset>
 
             <fieldset id="fieldset-audio" class="disabled">
                 <legend><label><input type="checkbox" id="input-audio" /> audio:</label></legend>
-                <div class="form__item">contentType:
-                    <input required id="input-audio-content-type" type="text" list="audio-codecs" size="30" value='audio/ogg; codecs="vorbis"' /> <input type="button" id="input-audio-content-type-reset" value="Reset" /> 
+                <div class="form__item form__item_required">contentType:
+                    <input required id="input-audio-content-type" type="text" list="audio-codecs" size="30" value='audio/ogg; codecs="vorbis"' /> <input type="button" id="input-audio-content-type-reset" value="×" /> 
                     <datalist id="audio-codecs">
                         <option value='audio/ogg; codecs="vorbis"'>audio/ogg; codecs="vorbis"</option>
                         <option value='audio/mp4; codecs="mp4a.40.2"'>audio/mp4; codecs="mp4a.40.2"</option>
@@ -72,15 +116,21 @@
                 </div>
 
                 <div class="form__item">channels:
-                    <input required type="number" id="input-audio-channels" value="2" size="2" />
+                    <input type="text" id="input-audio-channels" value="2.0" size=5" />
                 </div>
 
                 <div class="form__item">samplerate:
-                    <input required type="number" id="input-audio-samplerate" value="5300" size="8" />
+                    <input type="text" id="input-audio-samplerate" value="" size="8" />
                 </div>
 
                 <div class="form__item">bitrate:
-                    <input required type="number" id="input-audio-bitrate" value="200000" size="10" />
+                    <input type="text" id="input-audio-bitrate" value="" size="10" />
+                </div>
+
+                <div class="form__item">
+                    <label>
+                        <input type="checkbox" id="checkbox-audio-spatial-rendering" /> spatialRendering
+                    </label>
                 </div>
             </fieldset>            
             
@@ -88,7 +138,7 @@
                 <legend><label><input type="checkbox" id="input-key-system-configuration" /> keySystemConfiguration:</label></legend>
                 ⚠️ keySystemConfiguration is not supported in Safari.
 
-                <div class="form__item">keySystem: 
+                <div class="form__item form__item_required">keySystem: 
                     <select id="select-keysystem">
                         <option value="com.widevine.alpha">com.widevine.alpha</option>
                         <option value="com.microsoft.playready.recommendation">com.microsoft.playready.recommendation</option>
@@ -178,8 +228,12 @@
 
         <div id="error"></div>
 
+        <div id="query">
+            Parameters: <div id="input" style="display: none"></div>
+        </div>
+
         <div id="result">
-            Result: <div id="output" style="display: none"></div>
+            Result: <span id="status"></span> <div id="output" style="display: none"></div>
         </div>
     </div>
 

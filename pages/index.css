@@ -28,7 +28,7 @@ fieldset {
     padding: 0 .4em;
 }
 
-#result {
+#result, #query {
     margin-top: 1em;
 }
 
@@ -38,7 +38,7 @@ fieldset {
     font-weight: bold;
 }
 
-#output {
+#input, #output {
     margin-top: .5em;
     padding: 5px;
     white-space: pre;
@@ -52,13 +52,17 @@ fieldset {
 }
 
 fieldset.disabled {
-    opacity: .5;
+    color: gray;
     overflow: hidden;
     height: 2em;
 }
 
 .form__item {
     padding-top: .5em;
+}
+
+.form__item_required {
+    font-weight: bold;
 }
 
 #submit {
