@@ -1,5 +1,5 @@
 import { getDecodingInfo } from './utils/getDecodingInfo.js';
-import { getSupportedSize } from './checks/getSupportedSize.js';
+import { getSupportedSize } from './checks/getSupportedMaxSize.js';
 import { getSupportedMinSize } from './checks/getSupportedMinSize.js';
 import { getSupportedWidth } from './checks/getSupportedWidth.js';
 import { getSupportedHeight } from './checks/getSupportedHeight.js';
@@ -58,10 +58,10 @@ export async function findResolutionRestrictions(params) {
     resultData.supported.maxHeight = Infinity;
     resultData.smooth.value = supported.smooth;
 
-    const [supportedSize, supportedMinSize] = await Promise.all([getSupportedSize(params), getSupportedMinSize(params)]);
-    if (supportedSize.smoothMaxWidth) {
-        resultData.smooth.maxWidth = supportedSize.smoothMaxWidth;
-        resultData.smooth.maxHeight = supportedSize.smoothMaxHeight;
+    const [supportedMaxSize, supportedMinSize] = await Promise.all([getSupportedMaxSize(params), getSupportedMinSize(params)]);
+    if (supportedMaxSize.smoothMaxWidth) {
+        resultData.smooth.maxWidth = supportedMaxSize.smoothMaxWidth;
+        resultData.smooth.maxHeight = supportedMaxSize.smoothMaxHeight;
     }
 
     if (supportedMinSize) {
@@ -73,9 +73,9 @@ export async function findResolutionRestrictions(params) {
     }
 
     const [supportedWidth, supportedHeight, powerEfficientSize] = await Promise.all([
-        getSupportedWidth(params, supportedSize.result),
-        getSupportedHeight(params, supportedSize.result),
-        getPowerEfficientSize(params, supportedSize.result),
+        getSupportedWidth(params, supportedMaxSize.result),
+        getSupportedHeight(params, supportedMaxSize.result),
+        getPowerEfficientSize(params, supportedMaxSize.result),
     ]);
 
     if (supportedWidth.result) {
@@ -107,8 +107,8 @@ export async function findResolutionRestrictions(params) {
     }
 
     const [powerEfficientWidth, powerEfficientHeight] = await Promise.all([
-        getPowerEfficientWidth(params, supportedSize.result, powerEfficientSize.result),
-        getPowerEfficientHeight(params, supportedSize.result, powerEfficientSize.result)
+        getPowerEfficientWidth(params, supportedMaxSize.result, powerEfficientSize.result),
+        getPowerEfficientHeight(params, supportedMaxSize.result, powerEfficientSize.result)
     ]);
     
     if (powerEfficientSize.result && powerEfficientWidth === null) {
