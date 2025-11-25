@@ -6,7 +6,7 @@ import { getSupportedHeight } from './checks/getSupportedHeight.js';
 import { getPowerEfficientSize } from './checks/getPowerEfficientSize.js';
 import { getPowerEfficientWidth } from './checks/getPowerEfficientWidth.js';
 import { getPowerEfficientHeight } from './checks/getPowerEfficientHeight.js';
-import { MAX_SIZE, START_SIZE } from './const.js';
+import { MAX_SIZE, START_SIZE } from './consts.js';
 
 export async function findResolutionRestrictions(params) {
     const resultData = {

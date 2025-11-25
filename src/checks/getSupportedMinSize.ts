@@ -1,6 +1,6 @@
-import { MIN_SIZE, START_SIZE } from '../const.js';
-import { binarySearch } from '../utils/binarySearch.js';
-import { getDecodingInfo } from '../utils/getDecodingInfo.js';
+import { MIN_SIZE, START_SIZE } from '../consts';
+import { binarySearch } from '../utils/binarySearch';
+import { getDecodingInfo } from '../utils/getDecodingInfo';
 
 export async function getSupportedMinSize(params) {
     return await binarySearch(async (value) => {
