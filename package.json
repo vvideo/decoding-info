@@ -1,0 +1,27 @@
+{
+  "name": "decoding-info",
+  "version": "1.0.0",
+  "description": "Testing audio and video codec support in a browser with or without a key system",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "media",
+    "codec",
+    "decoding",
+    "browser",
+    "media-capabilities"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vvideo/decoding-info.git"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
+
