@@ -8,7 +8,7 @@ export async function getPowerEfficientHeight(configuration: MediaDecodingConfig
             getDecodingInfo({
                 ...configuration,
                 video: {
-                    ...configuration.video!,                
+                    ...configuration.video!,
                     width: powerEfficientWidth,
                     height: value,
                 },

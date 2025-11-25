@@ -2,31 +2,31 @@ import { MAX_SIZE } from '../consts';
 import { binarySearch } from '../utils/binarySearch';
 import { getDecodingInfo } from '../utils/getDecodingInfo';
 
-export async function getSupportedWidth(params, supportedSize) {
-    let smoothMaxWidth = null;
+export async function getSupportedWidth(configuration: MediaDecodingConfiguration, supportedHeight: number) {
+    let smoothMaxWidth: null | number = null;
 
     const result = await binarySearch(async (value) => {
         const [data1, data2] = await Promise.all([
             getDecodingInfo({
-                ...params,
+                ...configuration,
                 video: {
-                    ...params.video,                    
+                    ...configuration.video!,
                     width: value,
-                    height: supportedSize,
+                    height: supportedHeight,
                 }
             }),
             getDecodingInfo({
-                ...params,
+                ...configuration,
                 video: {
-                    ...params.video,
+                    ...configuration.video!,
                     width: value + 1,
-                    height: supportedSize,
+                    height: supportedHeight,
                 }
             }),
         ]);
 
         if (data1.supported && data1.smooth) {
-            smoothMaxWidth = Math.max(smoothMaxWidth, value);
+            smoothMaxWidth = Math.max(smoothMaxWidth || 0, value);
         }
 
         if (data1.supported !== data2.supported) {
@@ -38,8 +38,8 @@ export async function getSupportedWidth(params, supportedSize) {
         }
 
         return -1;
-    }, supportedSize, MAX_SIZE);
-    
+    }, supportedHeight, MAX_SIZE);
+
     return {
         result,
         smoothMaxWidth,

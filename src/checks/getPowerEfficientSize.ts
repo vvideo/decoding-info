@@ -25,7 +25,7 @@ export async function getPowerEfficientSize(configuration: MediaDecodingConfigur
             })
         ]);
 
-        if (data1.powerEfficient && !data2.powerEfficient) {
+        if (data1.powerEfficient !== data2.powerEfficient) {
             return 0;
         }
 

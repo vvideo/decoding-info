@@ -2,28 +2,28 @@ import { MIN_SIZE, START_SIZE } from '../consts';
 import { binarySearch } from '../utils/binarySearch';
 import { getDecodingInfo } from '../utils/getDecodingInfo';
 
-export async function getSupportedMinSize(params) {
+export async function getSupportedMinSize(configuration: MediaDecodingConfiguration) {
     return await binarySearch(async (value) => {
         const [data1, data2] = await Promise.all([
             getDecodingInfo({
-                ...params,
+                ...configuration,
                 video: {
-                    ...params.video,
+                    ...configuration.video!,
                     width: value,
                     height: value,
                 }
             }),
             getDecodingInfo({
-                ...params,
+                ...configuration,
                 video: {
-                    ...params.video,
+                    ...configuration.video!,
                     width: value - 1,
                     height: value - 1,
                 }
             })
         ]);
 
-        if (data1.supported && !data2.supported) {
+        if (data1.supported !== data2.supported) {
             return 0;
         }
 

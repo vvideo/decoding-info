@@ -8,7 +8,7 @@ export async function getPowerEfficientWidth(configuration: MediaDecodingConfigu
             getDecodingInfo({
                 ...configuration,
                 video: {
-                    ...configuration.video!,                
+                    ...configuration.video!,
                     width: value,
                     height: powerEfficientHeight,
                 },
@@ -23,7 +23,7 @@ export async function getPowerEfficientWidth(configuration: MediaDecodingConfigu
             })
         ]);
 
-        if (data1.powerEfficient && !data2.powerEfficient) {
+        if (data1.powerEfficient !== data2.powerEfficient) {
             return 0;
         }
 

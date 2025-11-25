@@ -1,64 +1,90 @@
-import { getDecodingInfo } from './utils/getDecodingInfo.js';
-import { getSupportedSize } from './checks/getSupportedMaxSize.js';
-import { getSupportedMinSize } from './checks/getSupportedMinSize.js';
-import { getSupportedWidth } from './checks/getSupportedWidth.js';
-import { getSupportedHeight } from './checks/getSupportedHeight.js';
-import { getPowerEfficientSize } from './checks/getPowerEfficientSize.js';
-import { getPowerEfficientWidth } from './checks/getPowerEfficientWidth.js';
-import { getPowerEfficientHeight } from './checks/getPowerEfficientHeight.js';
-import { MAX_SIZE, START_SIZE } from './consts.js';
+import { getDecodingInfo } from './utils/getDecodingInfo';
+import { getSupportedMaxSize } from './checks/getSupportedMaxSize';
+import { getSupportedMinSize } from './checks/getSupportedMinSize';
+import { getSupportedWidth } from './checks/getSupportedWidth';
+import { getSupportedHeight } from './checks/getSupportedHeight';
+import { getPowerEfficientSize } from './checks/getPowerEfficientSize';
+import { getPowerEfficientWidth } from './checks/getPowerEfficientWidth';
+import { getPowerEfficientHeight } from './checks/getPowerEfficientHeight';
+import { MAX_SIZE, START_SIZE } from './consts';
 
-export async function findResolutionRestrictions(params) {
-    const resultData = {
+interface ResultData {
+    supported: {
+        error: null | Error;
+        value: boolean;
+        minWidth: number | undefined;
+        minHeight: number | undefined;
+        maxWidth: number | undefined;
+        maxHeight: number | undefined;
+    };
+    smooth: {
+        value: boolean;
+        minWidth: number | undefined;
+        minHeight: number | undefined;
+        maxWidth: number | undefined;
+        maxHeight: number | undefined;
+    };
+    powerEfficient: {
+        value: boolean;
+        minWidth: number | undefined;
+        minHeight: number | undefined;
+        maxWidth: number | undefined;
+        maxHeight: number | undefined;
+    };
+};
+
+export async function findResolutionRestrictions(configuration: MediaDecodingConfiguration) {
+    const resultData: ResultData = {
         supported: {
             error: null,
             value: false,
-            maxWidth: 0,
-            maxHeight: 0,
+            minHeight: undefined,
+            minWidth: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined,
         },
         smooth: {
             value: false,
-            maxWidth: 0,
-            maxHeight: 0,
+            minHeight: undefined,
+            minWidth: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined,
         },
         powerEfficient: {
             value: false,
-            maxWidth: 0,
-            maxHeight: 0,
+            minHeight: undefined,
+            minWidth: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined,
         },
     };
 
-    let supported = false;
-
+    let decodingInfo: MediaCapabilitiesDecodingInfo;
     try {
-        supported = await getDecodingInfo({
-            ...params,
+        decodingInfo = await getDecodingInfo({
+            ...configuration,
             video: {
-                ...params.video,            
+                ...configuration.video!,
                 width: START_SIZE,
                 height: START_SIZE,
             },
         });
-    } catch(error) {
-        resultData.supported.error = {
-            name: error.name,
-            message: error.message,
-            stack: error.stack
-        };
+    } catch(error: any) {
+        resultData.supported.error = error;
 
         return resultData;
     }
 
-    if (!supported.supported) {
+    if (!decodingInfo.supported) {
         return resultData;
     }
 
     resultData.supported.value = true;
     resultData.supported.maxWidth = Infinity;
     resultData.supported.maxHeight = Infinity;
-    resultData.smooth.value = supported.smooth;
+    resultData.smooth.value = decodingInfo.smooth;
 
-    const [supportedMaxSize, supportedMinSize] = await Promise.all([getSupportedMaxSize(params), getSupportedMinSize(params)]);
+    const [supportedMaxSize, supportedMinSize] = await Promise.all([getSupportedMaxSize(configuration), getSupportedMinSize(configuration)]);
     if (supportedMaxSize.smoothMaxWidth) {
         resultData.smooth.maxWidth = supportedMaxSize.smoothMaxWidth;
         resultData.smooth.maxHeight = supportedMaxSize.smoothMaxHeight;
@@ -73,9 +99,9 @@ export async function findResolutionRestrictions(params) {
     }
 
     const [supportedWidth, supportedHeight, powerEfficientSize] = await Promise.all([
-        getSupportedWidth(params, supportedMaxSize.result),
-        getSupportedHeight(params, supportedMaxSize.result),
-        getPowerEfficientSize(params, supportedMaxSize.result),
+        getSupportedWidth(configuration, supportedMaxSize.result!),
+        getSupportedHeight(configuration, supportedMaxSize.result!),
+        getPowerEfficientSize(configuration, supportedMaxSize.result!),
     ]);
 
     if (supportedWidth.result) {
@@ -107,10 +133,10 @@ export async function findResolutionRestrictions(params) {
     }
 
     const [powerEfficientWidth, powerEfficientHeight] = await Promise.all([
-        getPowerEfficientWidth(params, supportedMaxSize.result, powerEfficientSize.result),
-        getPowerEfficientHeight(params, supportedMaxSize.result, powerEfficientSize.result)
+        getPowerEfficientWidth(configuration, supportedMaxSize.result!, powerEfficientSize.result!),
+        getPowerEfficientHeight(configuration, supportedMaxSize.result!, powerEfficientSize.result!)
     ]);
-    
+
     if (powerEfficientSize.result && powerEfficientWidth === null) {
         resultData.powerEfficient.maxWidth = Infinity;
     }

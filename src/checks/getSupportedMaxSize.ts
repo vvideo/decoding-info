@@ -2,7 +2,7 @@ import { MAX_SIZE, START_SIZE } from '../consts';
 import { binarySearch  } from '../utils/binarySearch';
 import { getDecodingInfo } from '../utils/getDecodingInfo';
 
-export async function getSupportedSize(configuration: MediaDecodingConfiguration) {
+export async function getSupportedMaxSize(configuration: MediaDecodingConfiguration) {
     let smoothMaxWidth: undefined | number = undefined;
     let smoothMaxHeight: undefined | number = undefined;
 

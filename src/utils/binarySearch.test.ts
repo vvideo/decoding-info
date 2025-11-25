@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { binarySearch } from './binarySearch.js';
+import { binarySearch } from './binarySearch';
 
 describe('binarySearch', () => {
     it('should find exact match in the middle', async () => {
