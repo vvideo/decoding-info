@@ -18,8 +18,6 @@ import { getVideoCodecSupportedResolution } from 'decoding-info';
 const configuration = {
     video: {
         codec: 'video/mp4; codecs="hvc1.1.6.L123.B0"',
-        width: 1920,
-        height: 1080,
         framerate: 25,
         bitrate: 1000000,
     },
@@ -29,7 +27,6 @@ getVideoCodecSupportedResolution(configuration).then((result) => {
     console.log(result);
     // {
     //     "error": null,
-    //     "attempts": 103,
     //     "supported": {
     //         "value": true,
     //         "minHeight": 16,
