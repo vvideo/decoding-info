@@ -4,8 +4,7 @@ import { getDecodingInfo } from './utils/getDecodingInfo';
 
 export async function getMaxSize(configuration: MediaDecodingConfiguration, getSupported: (result: MediaCapabilitiesDecodingInfo) => boolean, maxSize: number) {
     let maxWidth: undefined | number = undefined;
-
-    let attempts = 0;
+    let attempts = 1;
 
     const dataMaxSize = await getDecodingInfo({
         ...configuration,
@@ -15,8 +14,6 @@ export async function getMaxSize(configuration: MediaDecodingConfiguration, getS
             height: maxSize,
         }
     });
-
-    attempts++;
 
     const supportedMaxSize = getSupported(dataMaxSize);
     if (supportedMaxSize) {
@@ -29,6 +26,7 @@ export async function getMaxSize(configuration: MediaDecodingConfiguration, getS
     }
 
     const result = await binarySearch(async (value) => {
+        attempts++;
         const data1 = await getDecodingInfo({
             ...configuration,
             video: {
@@ -37,8 +35,6 @@ export async function getMaxSize(configuration: MediaDecodingConfiguration, getS
                 height: value,
             }
         });
-
-        attempts++;
 
         const supported1 = getSupported(data1);
         if (!supported1) {
@@ -49,6 +45,7 @@ export async function getMaxSize(configuration: MediaDecodingConfiguration, getS
             maxWidth = Math.max(maxWidth || 0, value);
         }
 
+        attempts++;
         const data2 = await getDecodingInfo({
             ...configuration,
             video: {
@@ -57,8 +54,6 @@ export async function getMaxSize(configuration: MediaDecodingConfiguration, getS
                 height: value + 1,
             }
         });
-
-        attempts++;
 
         const supported2 = getSupported(data2);
         if (supported2) {
@@ -77,9 +72,9 @@ export async function getMaxSize(configuration: MediaDecodingConfiguration, getS
     }, START_SIZE, maxSize);
 
     return {
-        result,
         attempts,
         maxWidth,
         maxHeight: maxWidth,
+        result,
     };
 }

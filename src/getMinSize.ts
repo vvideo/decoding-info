@@ -4,8 +4,7 @@ import { getDecodingInfo } from './utils/getDecodingInfo';
 
 export async function getMinSize(configuration: MediaDecodingConfiguration, getSupported: (result: MediaCapabilitiesDecodingInfo) => boolean, minSize: number) {
     let minWidth: undefined | number = undefined;
-
-    let attempts = 0;
+    let attempts = 1;
 
     const dataMinSize = await getDecodingInfo({
         ...configuration,
@@ -16,19 +15,18 @@ export async function getMinSize(configuration: MediaDecodingConfiguration, getS
         }
     });
 
-    attempts++;
-
     const supportedMinSize = getSupported(dataMinSize);
     if (supportedMinSize) {
         return {
-            result: minSize,
             attempts,
             minWidth: minSize,
             minHeight: minSize,
+            result: minSize,
         };
     }
 
     const result = await binarySearch(async (value) => {
+        attempts++;
         const data1 = await getDecodingInfo({
             ...configuration,
             video: {
@@ -38,14 +36,13 @@ export async function getMinSize(configuration: MediaDecodingConfiguration, getS
             }
         });
 
-        attempts++;
-
         const supported1 = getSupported(data1);
         if (supported1) {
             minWidth = Math.min(minWidth || Infinity, value - 1);
             return 1;
         }
 
+        attempts++;
         const data2 = await getDecodingInfo({
             ...configuration,
             video: {
@@ -54,8 +51,6 @@ export async function getMinSize(configuration: MediaDecodingConfiguration, getS
                 height: value,
             }
         });
-
-        attempts++;
 
         const supported2 = getSupported(data2);
         if (supported2) {
@@ -74,9 +69,9 @@ export async function getMinSize(configuration: MediaDecodingConfiguration, getS
     }, minSize, START_SIZE);
 
     return {
-        result,
         attempts,
         minWidth,
         minHeight: minWidth,
+        result,
     };
 }
