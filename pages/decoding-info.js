@@ -118,7 +118,7 @@ submit.onclick = () => {
 
     navigator.mediaCapabilities.decodingInfo(params).then(result => {
         console.info('Result', result);
-        status.innerText = (result.supported ? '✅' : '❌') + (result.powerEfficient ? ' 🔋' : '') + (result.smooth ? ' 🌿' : '');
+        status.innerHTML = (result.supported ? '✅' : '❌') + (result.powerEfficient ? ' <span title="Power efficiency">🔋</span>' : '') + (result.smooth ? ' <span title="Smooth">🌿</span>' : '');
         output.style.display = 'block';
         output.innerText = JSON.stringify(result, null, 4); 
     }).catch(e => {
