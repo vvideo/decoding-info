@@ -6,6 +6,11 @@
 
 This npm package allows you to determine the resolution of a supported video codec using the [MediaCapabilities API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/mediaCapabilities).
 
+Finding video codec resolution:
+- Minimum and maximum resolutions for a video codec.
+- Minimum and maximum resolutions for a video codec with smooth playback.
+- Minimum and maximum resolutions for a video codec in power-efficiency mode (similar to hardware acceleration).
+
 ## Installation
 ```bash
 npm install --save-dev decoding-info
