@@ -4,6 +4,8 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/decoding-info.svg?style=flat)](https://www.npmjs.org/package/decoding-info)
 [![install size](https://packagephobia.com/badge?p=decoding-info)](https://packagephobia.com/result?p=decoding-info)
 
+[Demo](https://vvideo.github.io/decoding-info/index.html)
+
 This npm package allows you to determine the resolution of a supported video codec using the [MediaCapabilities API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/mediaCapabilities).
 
 Finding video codec resolution:
@@ -58,9 +60,10 @@ getVideoCodecSupportedResolution(configuration).then((result) => {
 ```
 
 ## Links
-- [Test navigator.mediaCapabilities.decodingInfo()](https://vvideo.github.io/decoding-info/pages/decoding-info.html)
-- [Test MediaSource.isTypeSupported()](https://vvideo.github.io/decoding-info/pages/is-type-supported.html)
-- [Test .canPlayType()](https://vvideo.github.io/decoding-info/pages/can-play-type.html)
+- [Demo](https://vvideo.github.io/decoding-info/index.html)
+- [Test navigator.mediaCapabilities.decodingInfo()](https://vvideo.github.io/decoding-info/decoding-info.html)
+- [Test MediaSource.isTypeSupported()](https://vvideo.github.io/decoding-info/is-type-supported.html)
+- [Test .canPlayType()](https://vvideo.github.io/decoding-info/can-play-type.html)
 
 ## [License](./LICENSE)
 MIT
