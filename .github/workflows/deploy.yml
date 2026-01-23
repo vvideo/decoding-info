@@ -34,7 +34,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: './dist' # путь к собранным файлам
+          path: './pages' # путь к собранным файлам
 
   deploy:
     environment:
