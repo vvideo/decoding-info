@@ -1,3 +1,4 @@
 node_modules
 dist
 pages/index.esm.js
+.DS_Store
