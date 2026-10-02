@@ -1,80 +1,40 @@
 import { START_SIZE } from './consts';
-import { binarySearch  } from './utils/binarySearch';
 import { getDecodingInfo } from './utils/getDecodingInfo';
 
-export async function getMaxSize(configuration: MediaDecodingConfiguration, getSupported: (result: MediaCapabilitiesDecodingInfo) => boolean, maxSize: number) {
-    let maxWidth: undefined | number = undefined;
-    let attempts = 1;
-
-    const dataMaxSize = await getDecodingInfo({
+export async function getMaxSize(
+    configuration: MediaDecodingConfiguration,
+    getSupported: (result: MediaCapabilitiesDecodingInfo) => boolean,
+    maxSize: number,
+    startSize = START_SIZE,
+    getInfo = (size: number) => getDecodingInfo({
         ...configuration,
-        video: {
-            ...configuration.video!,
-            width: maxSize,
-            height: maxSize,
-        }
-    });
+        video: { ...configuration.video!, width: size, height: size },
+    }),
+) {
+    let attempts = 0;
+    const probe = async (size: number) => {
+        attempts++;
+        return getSupported(await getInfo(size));
+    };
 
-    const supportedMaxSize = getSupported(dataMaxSize);
-    if (supportedMaxSize) {
-        return {
-            result: maxSize,
-            attempts,
-            maxWidth: maxSize,
-            maxHeight: maxSize,
-        };
+    if (!await probe(startSize) || startSize > maxSize) {
+        return { attempts, maxWidth: undefined, maxHeight: undefined, result: null };
     }
 
-    const result = await binarySearch(async (value) => {
-        attempts++;
-        const data1 = await getDecodingInfo({
-            ...configuration,
-            video: {
-                ...configuration.video!,
-                width: value,
-                height: value,
-            }
-        });
+    if (startSize === maxSize || await probe(maxSize)) {
+        return { attempts, maxWidth: maxSize, maxHeight: maxSize, result: maxSize };
+    }
 
-        const supported1 = getSupported(data1);
-        if (!supported1) {
-            return 1;
+    let left = startSize;
+    let right = maxSize;
+    while (right - left > 1) {
+        const middle = Math.floor((left + right) / 2);
+        if (await probe(middle)) {
+            left = middle;
+        } else {
+            right = middle;
         }
+    }
 
-        if (supported1) {
-            maxWidth = Math.max(maxWidth || 0, value);
-        }
-
-        attempts++;
-        const data2 = await getDecodingInfo({
-            ...configuration,
-            video: {
-                ...configuration.video!,
-                width: value + 1,
-                height: value + 1,
-            }
-        });
-
-        const supported2 = getSupported(data2);
-        if (supported2) {
-            maxWidth = Math.max(maxWidth || 0, value + 1);
-        }
-
-        if (supported1 !== supported2) {
-            return 0;
-        }
-
-        if (supported1 && supported2) {
-            return -1;
-        }
-
-        return 1;
-    }, START_SIZE, maxSize);
-
-    return {
-        attempts,
-        maxWidth,
-        maxHeight: maxWidth,
-        result,
-    };
+    return { attempts, maxWidth: left, maxHeight: left, result: left };
 }

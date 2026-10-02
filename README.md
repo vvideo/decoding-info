@@ -13,6 +13,8 @@ Finding video codec resolution:
 - Minimum and maximum resolutions for a video codec with smooth playback.
 - Minimum and maximum resolutions for a video codec in power-efficiency mode (similar to hardware acceleration).
 
+The search starts at `startSize` (default: `320`). If the codec is not supported at that size, no ranges are searched. Smooth and power-efficient ranges are searched only when the corresponding property is true at `startSize`. The search assumes each qualifying range is continuous around the starting size. `minSize` and `maxSize` (defaults: `1` and `64000`) limit the search.
+
 ## Installation
 ```bash
 npm install --save-dev decoding-info

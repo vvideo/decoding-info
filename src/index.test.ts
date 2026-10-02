@@ -111,6 +111,9 @@ describe('getVideoCodecSupportedResolution', () => {
             bitrate: 1_000_000,
             framerate: 30,
         });
+        const requestedSizes = decodingInfo.mock.calls.map(([request]) => request.video!.width);
+        expect(new Set(requestedSizes).size).toBe(requestedSizes.length);
+        expect(requestedSizes.length).toBeLessThanOrEqual(54);
     });
 
     it('honors resolution bounds while leaving unavailable playback qualities empty', async () => {
@@ -138,5 +141,73 @@ describe('getVideoCodecSupportedResolution', () => {
             width: 600,
             height: 600,
         });
+    });
+
+    it('does not search qualities that fail at the starting size', async () => {
+        const decodingInfo = mockDecodingInfo(async request => {
+            const size = request.video!.width;
+            const supported = size >= 16 && size <= 1024;
+            return {
+                supported,
+                smooth: supported && size <= 100,
+                powerEfficient: supported && size >= 900,
+            } as MediaCapabilitiesDecodingInfo;
+        });
+
+        const result = await getVideoCodecSupportedResolution(configuration, {
+            minSize: 16,
+            maxSize: 1024,
+            startSize: 320,
+        });
+
+        expect(result.supported).toEqual({
+            value: true,
+            minWidth: 16,
+            minHeight: 16,
+            maxWidth: 1024,
+            maxHeight: 1024,
+        });
+        expect(result.smooth).toEqual({
+            value: false,
+            minWidth: undefined,
+            minHeight: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined,
+        });
+        expect(result.powerEfficient).toEqual({
+            value: false,
+            minWidth: undefined,
+            minHeight: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined,
+        });
+        expect(decodingInfo).toHaveBeenCalledTimes(3);
+    });
+
+    it('uses a custom starting size as the anchor for the minimum search', async () => {
+        const decodingInfo = mockDecodingInfo(async request => {
+            const size = request.video!.width;
+            const supported = size >= 400 && size <= 1200;
+            return {
+                supported,
+                smooth: supported,
+                powerEfficient: supported,
+            } as MediaCapabilitiesDecodingInfo;
+        });
+
+        const result = await getVideoCodecSupportedResolution(configuration, {
+            minSize: 1,
+            maxSize: 2000,
+            startSize: 600,
+        });
+
+        expect(result.supported.minWidth).toBe(400);
+        expect(result.supported.maxWidth).toBe(1200);
+        expect(result.smooth.minWidth).toBe(400);
+        expect(result.powerEfficient.minWidth).toBe(400);
+        expect(decodingInfo.mock.calls.every(([request]) => {
+            const size = request.video!.width;
+            return size >= 1 && size <= 2000;
+        })).toBe(true);
     });
 });

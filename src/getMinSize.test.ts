@@ -39,12 +39,21 @@ afterEach(() => {
 });
 
 describe('getMinSize', () => {
-    it('returns the requested lower bound after one probe when it qualifies', async () => {
+    it('stops when the starting size does not qualify, even if the lower bound does', async () => {
+        const decodingInfo = mockDecodingInfo(size => size === 16);
+
+        const result = await getMinSize(configuration, info => info.smooth, 16);
+
+        expect(result).toEqual({ result: null, attempts: 1, minWidth: undefined, minHeight: undefined });
+        expect(decodingInfo.mock.calls.map(([request]) => request.video!.width)).toEqual([320]);
+    });
+
+    it('returns the requested lower bound when it and the start qualify', async () => {
         const decodingInfo = mockDecodingInfo(() => true);
 
         const result = await getMinSize(configuration, info => info.smooth, 16);
 
-        expect(result).toEqual({ result: 16, attempts: 1, minWidth: 16, minHeight: 16 });
+        expect(result).toEqual({ result: 16, attempts: 2, minWidth: 16, minHeight: 16 });
         expect(decodingInfo).toHaveBeenCalledWith({
             ...configuration,
             video: { ...configuration.video!, width: 16, height: 16 },

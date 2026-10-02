@@ -39,12 +39,21 @@ afterEach(() => {
 });
 
 describe('getMaxSize', () => {
-    it('returns the requested upper bound after one probe when it qualifies', async () => {
+    it('stops when the starting size does not qualify, even if the upper bound does', async () => {
+        const decodingInfo = mockDecodingInfo(size => size === 2000);
+
+        const result = await getMaxSize(configuration, info => info.powerEfficient, 2000);
+
+        expect(result).toEqual({ result: null, attempts: 1, maxWidth: undefined, maxHeight: undefined });
+        expect(decodingInfo.mock.calls.map(([request]) => request.video!.width)).toEqual([320]);
+    });
+
+    it('returns the requested upper bound when it and the start qualify', async () => {
         const decodingInfo = mockDecodingInfo(() => true);
 
         const result = await getMaxSize(configuration, info => info.powerEfficient, 2000);
 
-        expect(result).toEqual({ result: 2000, attempts: 1, maxWidth: 2000, maxHeight: 2000 });
+        expect(result).toEqual({ result: 2000, attempts: 2, maxWidth: 2000, maxHeight: 2000 });
         expect(decodingInfo).toHaveBeenCalledWith({
             ...configuration,
             video: { ...configuration.video!, width: 2000, height: 2000 },

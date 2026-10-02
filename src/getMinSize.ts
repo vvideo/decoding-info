@@ -1,77 +1,40 @@
 import { START_SIZE } from './consts';
-import { binarySearch } from './utils/binarySearch';
 import { getDecodingInfo } from './utils/getDecodingInfo';
 
-export async function getMinSize(configuration: MediaDecodingConfiguration, getSupported: (result: MediaCapabilitiesDecodingInfo) => boolean, minSize: number) {
-    let minWidth: undefined | number = undefined;
-    let attempts = 1;
-
-    const dataMinSize = await getDecodingInfo({
+export async function getMinSize(
+    configuration: MediaDecodingConfiguration,
+    getSupported: (result: MediaCapabilitiesDecodingInfo) => boolean,
+    minSize: number,
+    startSize = START_SIZE,
+    getInfo = (size: number) => getDecodingInfo({
         ...configuration,
-        video: {
-            ...configuration.video!,
-            width: minSize,
-            height: minSize,
-        }
-    });
+        video: { ...configuration.video!, width: size, height: size },
+    }),
+) {
+    let attempts = 0;
+    const probe = async (size: number) => {
+        attempts++;
+        return getSupported(await getInfo(size));
+    };
 
-    const supportedMinSize = getSupported(dataMinSize);
-    if (supportedMinSize) {
-        return {
-            attempts,
-            minWidth: minSize,
-            minHeight: minSize,
-            result: minSize,
-        };
+    if (!await probe(startSize) || startSize < minSize) {
+        return { attempts, minWidth: undefined, minHeight: undefined, result: null };
     }
 
-    const result = await binarySearch(async (value) => {
-        attempts++;
-        const data1 = await getDecodingInfo({
-            ...configuration,
-            video: {
-                ...configuration.video!,
-                width: value - 1,
-                height: value - 1,
-            }
-        });
+    if (startSize === minSize || await probe(minSize)) {
+        return { attempts, minWidth: minSize, minHeight: minSize, result: minSize };
+    }
 
-        const supported1 = getSupported(data1);
-        if (supported1) {
-            minWidth = Math.min(minWidth || Infinity, value - 1);
-            return 1;
+    let left = minSize;
+    let right = startSize;
+    while (right - left > 1) {
+        const middle = Math.floor((left + right) / 2);
+        if (await probe(middle)) {
+            right = middle;
+        } else {
+            left = middle;
         }
+    }
 
-        attempts++;
-        const data2 = await getDecodingInfo({
-            ...configuration,
-            video: {
-                ...configuration.video!,
-                width: value,
-                height: value,
-            }
-        });
-
-        const supported2 = getSupported(data2);
-        if (supported2) {
-            minWidth = Math.min(minWidth || Infinity, value);
-        }
-
-        if (supported1 !== supported2) {
-            return 0;
-        }
-
-        if (supported1 && supported2) {
-            return 1;
-        }
-
-        return -1;
-    }, minSize, START_SIZE);
-
-    return {
-        attempts,
-        minWidth,
-        minHeight: minWidth,
-        result,
-    };
+    return { attempts, minWidth: right, minHeight: right, result: right };
 }

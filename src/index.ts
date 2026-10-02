@@ -39,6 +39,18 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
     const minSize = options?.minSize || MIN_SIZE;
     const maxSize = options?.maxSize || MAX_SIZE;
     const startSize = options?.startSize || START_SIZE;
+    const cache = new Map<number, Promise<MediaCapabilitiesDecodingInfo>>();
+    const probe = (size: number) => {
+        let pending = cache.get(size);
+        if (!pending) {
+            pending = getDecodingInfo({
+                ...configuration,
+                video: { ...configuration.video!, width: size, height: size },
+            });
+            cache.set(size, pending);
+        }
+        return pending;
+    };
 
     const resultData: ResultData = {
         error: null,
@@ -68,14 +80,7 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
 
     let decodingInfo: MediaCapabilitiesDecodingInfo;
     try {
-        decodingInfo = await getDecodingInfo({
-            ...configuration,
-            video: {
-                ...configuration.video!,
-                width: startSize,
-                height: startSize,
-            },
-        });
+        decodingInfo = await probe(startSize);
     } catch(error: any) {
         resultData.error = error;
 
@@ -93,12 +98,20 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
         smoothMinSize, smoothMaxSize,
         powerEfficientMinSize, powerEfficientMaxSize
     ] = await Promise.all([
-        getMinSize(configuration, (result) => result.supported, minSize),
-        getMaxSize(configuration, (result) => result.supported, maxSize),
-        getMinSize(configuration, (result) => result.supported && result.smooth, minSize),
-        getMaxSize(configuration, (result) => result.supported && result.smooth, maxSize),
-        getMinSize(configuration, (result) => result.supported && result.powerEfficient, minSize),
-        getMaxSize(configuration, (result) => result.supported && result.powerEfficient, maxSize),
+        getMinSize(configuration, (result) => result.supported, minSize, startSize, probe),
+        getMaxSize(configuration, (result) => result.supported, maxSize, startSize, probe),
+        decodingInfo.smooth
+            ? getMinSize(configuration, (result) => result.supported && result.smooth, minSize, startSize, probe)
+            : Promise.resolve(null),
+        decodingInfo.smooth
+            ? getMaxSize(configuration, (result) => result.supported && result.smooth, maxSize, startSize, probe)
+            : Promise.resolve(null),
+        decodingInfo.powerEfficient
+            ? getMinSize(configuration, (result) => result.supported && result.powerEfficient, minSize, startSize, probe)
+            : Promise.resolve(null),
+        decodingInfo.powerEfficient
+            ? getMaxSize(configuration, (result) => result.supported && result.powerEfficient, maxSize, startSize, probe)
+            : Promise.resolve(null),
     ]);
 
     if (supportedMinSize.minWidth) {
@@ -111,38 +124,31 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
         resultData.supported.maxHeight = supportedMaxSize.maxHeight;
     }
 
-    if (smoothMinSize.minWidth) {
+    if (smoothMinSize?.minWidth) {
         resultData.smooth.value = true;
         resultData.smooth.minWidth = smoothMinSize.minWidth;
         resultData.smooth.minHeight = smoothMinSize.minHeight;
     }
 
-    if (smoothMaxSize.maxWidth) {
+    if (smoothMaxSize?.maxWidth) {
         resultData.smooth.value = true;
         resultData.smooth.maxWidth = smoothMaxSize.maxWidth;
         resultData.smooth.maxHeight = smoothMaxSize.maxHeight;
     }
 
-    if (powerEfficientMinSize.minHeight) {
+    if (powerEfficientMinSize?.minHeight) {
         resultData.powerEfficient.value = true;
         resultData.powerEfficient.minWidth = powerEfficientMinSize.minWidth;
         resultData.powerEfficient.minHeight = powerEfficientMinSize.minHeight;
     }
 
-    if (powerEfficientMaxSize.maxWidth) {
+    if (powerEfficientMaxSize?.maxWidth) {
         resultData.powerEfficient.value = true;
         resultData.powerEfficient.maxWidth = powerEfficientMaxSize.maxWidth;
         resultData.powerEfficient.maxHeight = powerEfficientMaxSize.maxHeight;
     }
 
-    resultData.attempts += (
-        supportedMinSize.attempts +
-        supportedMaxSize.attempts +
-        smoothMinSize.attempts +
-        smoothMaxSize.attempts +
-        powerEfficientMinSize.attempts +
-        powerEfficientMaxSize.attempts
-    );
+    resultData.attempts = cache.size;
 
     return resultData;
 }
