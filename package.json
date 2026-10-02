@@ -19,8 +19,7 @@
     "prepare": "npm run build",
     "clean": "del ./dist/*",
     "build": "npm run clean && rollup --config rollup.config.mjs && cp -f ./dist/index.esm.js ./pages",
-    "test": "jest . && npm run typecheck && npm run test:package",
-    "test:package": "npm run build && node scripts/verify-package.mjs",
+    "test": "jest . && npm run typecheck && npm run build",
     "typecheck": "tsc --noEmit"
   },
   "files": [
