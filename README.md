@@ -74,6 +74,21 @@ getVideoCodecSupportedResolution(configuration, {
 
 Each quality has a `value` flag and minimum and maximum width and height fields. Boundaries are `undefined` when that quality has no range around `startSize`. The browser determines whether decoding is smooth or power efficient; power efficiency does not necessarily mean hardware acceleration.
 
+## Development
+
+Install dependencies and run the unit tests, type check, and build:
+
+```bash
+npm ci
+npm test
+```
+
+Run `npm run build` to rebuild `dist` and copy the ESM bundle to `pages/index.esm.js` for the demo.
+
+## Release
+
+Update the version in `package.json` and `package-lock.json`, add a CHANGELOG entry, and run `npm test`. Publishing a GitHub release triggers the npm workflow, which runs the tests before publishing. Use a `v<version>` release tag; prereleases go to npm's `next` tag and regular releases to `latest`.
+
 ## Links
 - [Demo](https://vvideo.github.io/decoding-info/index.html)
 - [Test navigator.mediaCapabilities.decodingInfo()](https://vvideo.github.io/decoding-info/decoding-info.html)
