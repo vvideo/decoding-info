@@ -35,10 +35,14 @@ interface GetVideoCodecSupportedResolutionOptions {
     startSize?: number;
 }
 
+function toError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
+}
+
 export async function getVideoCodecSupportedResolution(configuration: MediaDecodingConfiguration, options?: GetVideoCodecSupportedResolutionOptions) {
-    const minSize = options?.minSize || MIN_SIZE;
-    const maxSize = options?.maxSize || MAX_SIZE;
-    const startSize = options?.startSize || START_SIZE;
+    const minSize = options?.minSize === undefined ? MIN_SIZE : options.minSize;
+    const maxSize = options?.maxSize === undefined ? MAX_SIZE : options.maxSize;
+    const startSize = options?.startSize === undefined ? START_SIZE : options.startSize;
     const cache = new Map<number, Promise<MediaCapabilitiesDecodingInfo>>();
     const probe = (size: number) => {
         let pending = cache.get(size);
@@ -54,7 +58,7 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
 
     const resultData: ResultData = {
         error: null,
-        attempts: 1,
+        attempts: 0,
         supported: {
             value: false,
             minWidth: undefined,
@@ -78,14 +82,24 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
         },
     };
 
+    if (![minSize, maxSize, startSize].every((size) => Number.isSafeInteger(size) && size > 0)) {
+        resultData.error = new RangeError('Resolution sizes must be positive safe integers');
+        return resultData;
+    }
+    if (minSize > maxSize || startSize < minSize || startSize > maxSize) {
+        resultData.error = new RangeError('Expected minSize <= startSize <= maxSize');
+        return resultData;
+    }
+
     let decodingInfo: MediaCapabilitiesDecodingInfo;
     try {
         decodingInfo = await probe(startSize);
-    } catch(error: any) {
-        resultData.error = error;
-
+    } catch(error: unknown) {
+        resultData.error = toError(error);
+        resultData.attempts = cache.size;
         return resultData;
     }
+    resultData.attempts = cache.size;
 
     if (!decodingInfo.supported) {
         return resultData;
@@ -93,11 +107,7 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
 
     resultData.supported.value = true;
 
-    const [
-        supportedMinSize, supportedMaxSize,
-        smoothMinSize, smoothMaxSize,
-        powerEfficientMinSize, powerEfficientMaxSize
-    ] = await Promise.all([
+    const searches = [
         getMinSize(configuration, (result) => result.supported, minSize, startSize, probe),
         getMaxSize(configuration, (result) => result.supported, maxSize, startSize, probe),
         decodingInfo.smooth
@@ -112,7 +122,21 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
         decodingInfo.powerEfficient
             ? getMaxSize(configuration, (result) => result.supported && result.powerEfficient, maxSize, startSize, probe)
             : Promise.resolve(null),
-    ]);
+    ] as const;
+    let searchResults: Awaited<ReturnType<typeof Promise.all<typeof searches>>>;
+    try {
+        searchResults = await Promise.all(searches);
+    } catch (error: unknown) {
+        await Promise.allSettled(searches);
+        resultData.error = toError(error);
+        resultData.attempts = cache.size;
+        return resultData;
+    }
+    const [
+        supportedMinSize, supportedMaxSize,
+        smoothMinSize, smoothMaxSize,
+        powerEfficientMinSize, powerEfficientMaxSize
+    ] = searchResults;
 
     if (supportedMinSize.minWidth) {
         resultData.supported.minWidth = supportedMinSize.minWidth;

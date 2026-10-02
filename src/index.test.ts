@@ -32,6 +32,53 @@ afterEach(() => {
 });
 
 describe('getVideoCodecSupportedResolution', () => {
+    it('rejects invalid resolution bounds before probing', async () => {
+        const decodingInfo = mockDecodingInfo(async () => ({
+            supported: false,
+            smooth: false,
+            powerEfficient: false,
+        } as MediaCapabilitiesDecodingInfo));
+
+        for (const options of [
+            { minSize: 0 },
+            { maxSize: 1.5 },
+            { startSize: Infinity },
+            { minSize: 500, maxSize: 400 },
+            { minSize: 400, maxSize: 800, startSize: 320 },
+        ]) {
+            const result = await getVideoCodecSupportedResolution(configuration, options);
+            expect(result.error).toBeInstanceOf(RangeError);
+            expect(result.attempts).toBe(0);
+            expect(result.supported.value).toBe(false);
+        }
+        expect(decodingInfo).not.toHaveBeenCalled();
+    });
+
+    it('returns a search error with the completed probe count', async () => {
+        const error = new Error('search probe failed');
+        const decodingInfo = mockDecodingInfo(async request => {
+            if (request.video!.width === 1) {
+                throw error;
+            }
+            return {
+                supported: true,
+                smooth: false,
+                powerEfficient: false,
+            } as MediaCapabilitiesDecodingInfo;
+        });
+
+        const result = await getVideoCodecSupportedResolution(configuration, {
+            minSize: 1,
+            maxSize: 1000,
+            startSize: 320,
+        });
+
+        expect(result.error).toBe(error);
+        expect(result.attempts).toBe(decodingInfo.mock.calls.length);
+        expect(result.supported.minWidth).toBeUndefined();
+        expect(result.supported.maxWidth).toBeUndefined();
+    });
+
     it('returns an empty result after an unsupported starting probe', async () => {
         const decodingInfo = mockDecodingInfo(async () => ({
             supported: false,
@@ -67,6 +114,16 @@ describe('getVideoCodecSupportedResolution', () => {
         expect(result.smooth.value).toBe(false);
         expect(result.powerEfficient.value).toBe(false);
         expect(decodingInfo).toHaveBeenCalledTimes(1);
+    });
+
+    it('normalizes a non-Error rejection from the browser API', async () => {
+        mockDecodingInfo(async () => { throw 'decodingInfo failed'; });
+
+        const result = await getVideoCodecSupportedResolution(configuration);
+
+        expect(result.error).toBeInstanceOf(Error);
+        expect(result.error?.message).toBe('decodingInfo failed');
+        expect(result.attempts).toBe(1);
     });
 
     it('finds independent supported, smooth, and power-efficient ranges', async () => {

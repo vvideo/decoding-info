@@ -15,6 +15,8 @@ Finding video codec resolution:
 
 The search starts at `startSize` (default: `320`). If the codec is not supported at that size, no ranges are searched. Smooth and power-efficient ranges are searched only when the corresponding property is true at `startSize`. The search assumes each qualifying range is continuous around the starting size. `minSize` and `maxSize` (defaults: `1` and `64000`) limit the search.
 
+Size options must be positive safe integers with `minSize <= startSize <= maxSize`. Invalid options return a `RangeError` in `error` with `attempts: 0`. Browser probe failures also appear in `error`; `attempts` counts the distinct sizes probed. When `error` is set, the resolution ranges may be incomplete.
+
 ## Installation
 ```bash
 npm install --save-dev decoding-info
