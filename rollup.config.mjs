@@ -5,9 +5,9 @@ export default [
     input: 'src/index.ts',
     output: {
       format: 'cjs',
-      file: './dist/index.common.js'
+      file: './dist/index.common.cjs'
     },
-    plugins: [typescript({ tsconfig: './tsconfig.json' })],
+    plugins: [typescript({ tsconfig: './tsconfig.build.json' })],
   },
   {
     input: 'src/index.ts',
@@ -15,6 +15,6 @@ export default [
       format: 'es',
       file: './dist/index.esm.js'
     },
-    plugins: [typescript({ tsconfig: './tsconfig.json' })],
+    plugins: [typescript({ tsconfig: './tsconfig.build.json' })],
   }
 ];

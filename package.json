@@ -3,21 +3,31 @@
   "version": "1.0.2",
   "description": "Testing audio and video codec support in a browser with or without a key system",
   "type": "module",
-  "main": "src/index.common.js",
-  "module": "src/index.esm.js",
-  "typings": "src/index.d.ts",
+  "main": "./dist/index.common.cjs",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.common.cjs"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "prepare": "npm run build",    
+    "prepare": "npm run build",
     "clean": "del ./dist/*",
     "build": "npm run clean && rollup --config rollup.config.mjs && cp -f ./dist/index.esm.js ./pages",
-    "test": "jest . && npm run typecheck",
+    "test": "jest . && npm run typecheck && npm run test:package",
+    "test:package": "npm run build && node scripts/verify-package.mjs",
     "typecheck": "tsc --noEmit"
   },
   "files": [
     "dist",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE.md"
+    "LICENSE"
   ],
   "keywords": [
     "media",
