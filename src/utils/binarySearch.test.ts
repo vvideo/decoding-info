@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, jest } from '@jest/globals';
 import { binarySearch } from './binarySearch';
 
 describe('binarySearch', () => {
@@ -124,8 +124,7 @@ describe('binarySearch', () => {
     });
 
     it('should handle case where value is not at maxValue boundary', async () => {
-        // This tests the edge case where maxValue itself might be the answer
-        // but binarySearch uses [left, right) interval, so maxValue is excluded
+        // The target is just below the inclusive upper bound.
         const compareFn = (value: number) => {
             if (value === 100) return 0;
             if (value < 100) return -1;
@@ -135,5 +134,18 @@ describe('binarySearch', () => {
         // maxValue = 101, so 100 should be found
         const result = await binarySearch(compareFn, 0, 101);
         expect(result).toBe(100);
+    });
+
+    it('includes the upper bound in the search', async () => {
+        const result = await binarySearch(value => value - 100, 0, 100);
+
+        expect(result).toBe(100);
+    });
+
+    it('returns null without calling the comparator for an empty range', async () => {
+        const compareFn = jest.fn(() => 0);
+
+        await expect(binarySearch(compareFn, 10, 9)).resolves.toBeNull();
+        expect(compareFn).not.toHaveBeenCalled();
     });
 });
