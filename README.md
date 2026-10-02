@@ -9,17 +9,17 @@
 This npm package allows you to determine the resolution of a supported video codec using the [MediaCapabilities API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/mediaCapabilities).
 
 Finding video codec resolution:
-- Minimum and maximum resolutions for a video codec.
-- Minimum and maximum resolutions for a video codec with smooth playback.
-- Minimum and maximum resolutions for a video codec in power-efficiency mode (similar to hardware acceleration).
+- Minimum and maximum square resolutions for a video codec.
+- Minimum and maximum square resolutions with smooth playback.
+- Minimum and maximum square resolutions the browser reports as power efficient.
 
-The search starts at `startSize` (default: `320`). If the codec is not supported at that size, no ranges are searched. Smooth and power-efficient ranges are searched only when the corresponding property is true at `startSize`. The search assumes each qualifying range is continuous around the starting size. `minSize` and `maxSize` (defaults: `1` and `64000`) limit the search.
+Each probe sets both `video.width` and `video.height` to the same size. The search starts at `startSize` (default: `320`). If the codec is not supported at that size, no ranges are searched. Smooth and power-efficient ranges are searched only when the corresponding property is true at `startSize`. The search assumes each qualifying range is continuous around the starting size. `minSize` and `maxSize` (defaults: `1` and `64000`) limit the search.
 
 Size options must be positive safe integers with `minSize <= startSize <= maxSize`. Invalid options return a `RangeError` in `error` with `attempts: 0`. Browser probe failures also appear in `error`; `attempts` counts the distinct sizes probed. When `error` is set, the resolution ranges may be incomplete.
 
 ## Installation
 ```bash
-npm install --save-dev decoding-info
+npm install decoding-info
 ```
 
 ## Usage
@@ -27,41 +27,52 @@ npm install --save-dev decoding-info
 import { getVideoCodecSupportedResolution } from 'decoding-info';
 
 const configuration = {
+    type: 'file',
     video: {
-        codec: 'video/mp4; codecs="hvc1.1.6.L123.B0"',
+        contentType: 'video/mp4; codecs="avc1.42E01E"',
+        width: 320,
+        height: 320,
         framerate: 25,
-        bitrate: 1000000,
+        bitrate: 1_000_000,
     },
 };
 
-getVideoCodecSupportedResolution(configuration).then((result) => {
+getVideoCodecSupportedResolution(configuration, {
+    minSize: 16,
+    maxSize: 8192,
+    startSize: 320,
+}).then((result) => {
     console.log(result);
+    // Example when all three qualities are available at both bounds:
     // {
     //     "error": null,
+    //     "attempts": 3,
     //     "supported": {
     //         "value": true,
-    //         "minHeight": 16,
     //         "minWidth": 16,
+    //         "minHeight": 16,
     //         "maxWidth": 8192,
     //         "maxHeight": 8192
     //     },
     //     "smooth": {
     //         "value": true,
-    //         "minHeight": 16,
     //         "minWidth": 16,
+    //         "minHeight": 16,
     //         "maxWidth": 8192,
     //         "maxHeight": 8192
     //     },
     //     "powerEfficient": {
     //         "value": true,
-    //         "minHeight": 16,
     //         "minWidth": 16,
+    //         "minHeight": 16,
     //         "maxWidth": 8192,
     //         "maxHeight": 8192
     //     }
     // }
 });
 ```
+
+Each quality has a `value` flag and minimum and maximum width and height fields. Boundaries are `undefined` when that quality has no range around `startSize`. The browser determines whether decoding is smooth or power efficient; power efficiency does not necessarily mean hardware acceleration.
 
 ## Links
 - [Demo](https://vvideo.github.io/decoding-info/index.html)

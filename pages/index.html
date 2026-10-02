@@ -1,5 +1,9 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video Codec Supported Resolutions</title>
     <link rel="stylesheet" href="./index.css" />
     <style>
         body {
@@ -40,8 +44,8 @@
             <li><a href="./decoding-info.html">Test navigator.mediaCapabilities.decodingInfo</a></li>
             <li><a href="./is-type-supported.html">Test MediaSource.isTypeSupported</a></li>
             <li><a href="./can-play-type.html">Test canPlayType</a></li>
-            <li><a href="https://github.com/vvideo/decoding-info">Github repo</a></li>
-            <li><a target="_blank" href="https://www.w3.org/TR/media-capabilities/">Media Capabilites</a></li>
+            <li><a href="https://github.com/vvideo/decoding-info">GitHub repo</a></li>
+            <li><a target="_blank" href="https://www.w3.org/TR/media-capabilities/">Media Capabilities</a></li>
         </ul>
 
         <fieldset>
@@ -70,13 +74,15 @@
                 </div>
 
                 <div class="form__item">Framerate:
-                    <input type="text" id="input-video-framerate" value="25" />
+                    <input type="number" id="input-video-framerate" min="0.001" step="any" value="25" />
                 </div>
 
                 <div class="form__item">Bitrate:
-                    <input type="text" id="input-video-bitrate" value="200000" />
+                    <input type="number" id="input-video-bitrate" min="1" step="1" value="200000" />
                 </div>
             </fieldset>
+
+            <p>Each probe uses the same value for video width and height.</p>
 
             <fieldset>
                 <legend>Key system configuration</legend>
@@ -91,7 +97,8 @@
                 <div class="form__item">
                     Robustness:
                     <input id="input-robustness" type="text" value="" />
-                </div class="form__item">
+                </div>
+                <p>Key systems apply to file and media-source types.</p>
             </fieldset>
         </fieldset>
 
@@ -130,13 +137,15 @@
         const params = {
             type: selectType.value,
             video: {
-                contentType: inputVideoContentType.value,
-                framerate: parseInt(inputVideoFramerate.value, 10),
-                bitrate: parseInt(inputVideoBitrate.value, 10),
+                contentType: inputVideoContentType.value.trim(),
+                framerate: inputVideoFramerate.valueAsNumber,
+                bitrate: inputVideoBitrate.valueAsNumber,
             },
             keySystemConfiguration: selectKeySystem.value ? {
                 keySystem: selectKeySystem.value,
-                robustness: inputRobustness.value,
+                video: inputRobustness.value.trim() ? {
+                    robustness: inputRobustness.value.trim(),
+                } : undefined,
             } : undefined,
         };
 
@@ -148,7 +157,9 @@
 
         console.log('result', data);
         outputResult.style.display = 'block';
-        outputResult.innerText = JSON.stringify(data, null, 4);
+        outputResult.innerText = JSON.stringify(data, (_key, value) =>
+            value instanceof Error ? { name: value.name, message: value.message } : value,
+        4);
     }
 </script>
 
