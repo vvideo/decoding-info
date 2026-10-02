@@ -1,6 +1,6 @@
 {
   "name": "decoding-info",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Testing audio and video codec support in a browser with or without a key system",
   "type": "module",
   "main": "./dist/index.common.cjs",
