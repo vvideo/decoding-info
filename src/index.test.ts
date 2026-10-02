@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { getVideoCodecSupportedResolution } from './index';
 
-const configuration: MediaDecodingConfiguration = {
+const configuration = {
     type: 'file',
     video: {
         contentType: 'video/mp4; codecs="avc1.42E01E"',
@@ -10,7 +10,7 @@ const configuration: MediaDecodingConfiguration = {
         bitrate: 1_000_000,
         framerate: 30,
     },
-};
+} satisfies MediaDecodingConfiguration;
 
 const originalMediaCapabilities = Object.getOwnPropertyDescriptor(navigator, 'mediaCapabilities');
 
@@ -32,6 +32,30 @@ afterEach(() => {
 });
 
 describe('getVideoCodecSupportedResolution', () => {
+    it('rejects an audio-only configuration without probing', async () => {
+        const decodingInfo = mockDecodingInfo(async () => ({
+            supported: false,
+            smooth: false,
+            powerEfficient: false,
+        } as MediaCapabilitiesDecodingInfo));
+        const audioOnly: MediaDecodingConfiguration = {
+            type: 'file',
+            audio: {
+                contentType: 'audio/mp4; codecs="mp4a.40.2"',
+                channels: '2',
+                bitrate: 128_000,
+                samplerate: 44_100,
+            },
+        };
+
+        const result = await getVideoCodecSupportedResolution(audioOnly as never);
+
+        expect(result.error).toBeInstanceOf(TypeError);
+        expect(result.error?.message).toMatch(/video/i);
+        expect(result.attempts).toBe(0);
+        expect(decodingInfo).not.toHaveBeenCalled();
+    });
+
     it('rejects invalid resolution bounds before probing', async () => {
         const decodingInfo = mockDecodingInfo(async () => ({
             supported: false,

@@ -35,11 +35,15 @@ interface GetVideoCodecSupportedResolutionOptions {
     startSize?: number;
 }
 
+interface VideoDecodingConfiguration extends MediaDecodingConfiguration {
+    video: VideoConfiguration;
+}
+
 function toError(error: unknown): Error {
     return error instanceof Error ? error : new Error(String(error));
 }
 
-export async function getVideoCodecSupportedResolution(configuration: MediaDecodingConfiguration, options?: GetVideoCodecSupportedResolutionOptions) {
+export async function getVideoCodecSupportedResolution(configuration: VideoDecodingConfiguration, options?: GetVideoCodecSupportedResolutionOptions) {
     const minSize = options?.minSize === undefined ? MIN_SIZE : options.minSize;
     const maxSize = options?.maxSize === undefined ? MAX_SIZE : options.maxSize;
     const startSize = options?.startSize === undefined ? START_SIZE : options.startSize;
@@ -49,7 +53,7 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
         if (!pending) {
             pending = getDecodingInfo({
                 ...configuration,
-                video: { ...configuration.video!, width: size, height: size },
+                video: { ...configuration.video, width: size, height: size },
             });
             cache.set(size, pending);
         }
@@ -81,6 +85,11 @@ export async function getVideoCodecSupportedResolution(configuration: MediaDecod
             maxHeight: undefined,
         },
     };
+
+    if (!configuration?.video) {
+        resultData.error = new TypeError('Video configuration is required');
+        return resultData;
+    }
 
     if (![minSize, maxSize, startSize].every((size) => Number.isSafeInteger(size) && size > 0)) {
         resultData.error = new RangeError('Resolution sizes must be positive safe integers');
