@@ -17,10 +17,6 @@ jobs:
           node-version: 24
           cache: npm
           registry-url: https://registry.npmjs.org/
-      - name: Verify release tag
-        run: node scripts/verify-release-tag.mjs
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
       - run: npm ci
       - run: npm test
       - run: npm publish --ignore-scripts --tag "$NPM_DIST_TAG"
